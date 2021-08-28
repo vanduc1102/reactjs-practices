@@ -31,6 +31,7 @@
     "@reduxjs/toolkit": "^1.6.1",
     "core-js": "^3.6.5",
     "formik": "^2.2.9",
+    "miragejs": "^0.1.41",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-is": "17.0.2",

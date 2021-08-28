@@ -1,6 +1,6 @@
 import { createReducer } from '@reduxjs/toolkit';
 
-import { login, logout } from './actions';
+import { loggedIn, loggedOut } from './actions';
 import { AccountState } from './types';
 
 const serializedUser = localStorage.getItem('user');
@@ -13,13 +13,15 @@ const initialState: AccountState = {
 
 export default createReducer(initialState, (builder) =>
   builder
-    .addCase(login.fulfilled, (_, action) => {
+    .addCase(loggedIn, (_, action) => {
+      localStorage.setItem('user', JSON.stringify(action.payload));
       return {
         isLogin: true,
         user: action.payload,
       };
     })
-    .addCase(logout.fulfilled, (_, action) => {
+    .addCase(loggedOut, (_, action) => {
+      localStorage.removeItem('user');
       return {
         isLogin: false,
         user: undefined,

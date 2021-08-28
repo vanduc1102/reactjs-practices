@@ -1,12 +1,12 @@
-import { PrimaryButton, Text, TextField } from '@fluentui/react';
+import { PrimaryButton, Spinner, Text, TextField } from '@fluentui/react';
 import { useFormik } from 'formik';
 import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 import * as Yup from 'yup';
-import { userService } from '../../services';
+
 import { RootState } from '../../state';
-import { login } from '../../state/account/actions';
+import { useLoginMutation } from '../../state/api/user';
 import { Login } from './types';
 
 const LoginSchema = Yup.object().shape({
@@ -19,11 +19,11 @@ export * from './LoginAlert';
 const LoginPage = () => {
   const account = useSelector((state: RootState) => state.account);
   const { push } = useHistory();
-  const dispatch = useDispatch();
+  const [login, { isLoading }] = useLoginMutation();
 
   const handleSubmit = async (userCredential: Login) => {
     try {
-      dispatch(login(userCredential));
+      login(userCredential);
     } catch (error) {
       alert(error);
     }
@@ -35,7 +35,7 @@ const LoginPage = () => {
         pathname: '/',
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account.isLogin]);
 
   const formik = useFormik<Login>({
@@ -77,11 +77,19 @@ const LoginPage = () => {
           value={formik.values.password}
         />
         <br />
-        <PrimaryButton
-          text="Login"
-          type="submit"
-          disabled={formik.isSubmitting}
-        ></PrimaryButton>
+        {isLoading ? (
+          <Spinner
+            label="Wait, wait..."
+            ariaLive="assertive"
+            labelPosition="right"
+          />
+        ) : (
+          <PrimaryButton
+            text="Login"
+            type="submit"
+            disabled={isLoading}
+          ></PrimaryButton>
+        )}
       </form>
     </div>
   );

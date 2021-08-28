@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Route, Switch, useLocation } from 'react-router-dom';
+import React from 'react';
+import { Route, Switch } from 'react-router-dom';
 
 import HomePage from '../HomePage';
 import LoginPage from '../LoginPage';
@@ -8,7 +8,8 @@ import LoginAlert from '../LoginPage/LoginAlert';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../state';
 
-export function App() {
+
+export function App():React.ReactElement {
   const isLogin = useSelector(({ account }: RootState) => account.isLogin);
 
   return (

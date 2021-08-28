@@ -1,24 +1,21 @@
 import React from 'react';
-import { FontSizes, PrimaryButton, Text } from '@fluentui/react';
+import { FontSizes, PrimaryButton, Spinner, Text } from '@fluentui/react';
+import { useSelector } from 'react-redux';
 
-import { User } from '../../types/user';
-import { useHistory } from 'react-router-dom';
-import Counter from '../Counter';
-import { useDispatch } from 'react-redux';
-import { logout } from '../../state/account/actions';
-const user: User = {
-  id: 1,
-  firstName: 'fTest',
-  lastName: 'lTest',
-};
+import { RootState } from '../../state';
+import { AccountState } from '../../state/account/types';
+import { useGetUsersQuery, useLogoutMutation } from '../../state/api/user';
 
 const HomePage: React.FC = () => {
-  const dispatch = useDispatch();
+  const { data: users, isLoading, error } = useGetUsersQuery();
+  const [logout, { isLoading: isLoggingOut }] = useLogoutMutation();
 
-  const users = { loading: false, error: false, items: [{ ...user }] };
+  const { user } = useSelector<RootState, AccountState>(
+    ({ account }) => account
+  );
 
   const handleLogout = () => {
-    dispatch(logout());
+    logout();
   };
 
   return (
@@ -28,18 +25,21 @@ const HomePage: React.FC = () => {
         margin: 'auto',
       }}
     >
-      <div style={{ fontSize: FontSizes.size32 }}>Hi {user.firstName}</div>
+      <div style={{ fontSize: FontSizes.size32 }}>Hi {user?.firstName}</div>
       <div style={{ fontSize: FontSizes.size24 }}>
         You're logged in with React & JWT!!
       </div>
       <Text as="h3" block={true}>
         Users from secure api end point:
       </Text>
-      {users.loading && <em>Loading users...</em>}
-      {users.error && <span className="text-danger">ERROR: {users.error}</span>}
-      {users.items && (
+      {isLoading && <Spinner label="Loading users..." />}
+      {error && (
+        <span className="text-danger">ERROR: {JSON.stringify(error)}</span>
+      )}
+
+      {users && (
         <ul>
-          {users.items.map((user) => (
+          {users.map((user) => (
             <li key={user.id}>
               <Text block={true}>First Name: {user.firstName}</Text>
               <Text block={true}>Last Name: {user.lastName}</Text>
@@ -47,9 +47,19 @@ const HomePage: React.FC = () => {
           ))}
         </ul>
       )}
-      <Text as="p" block={true}>
-        <PrimaryButton onClick={handleLogout}>Logout</PrimaryButton>
-      </Text>
+      <div>
+        {isLoggingOut ? (
+          <Spinner
+            label="Wait, wait..."
+            ariaLive="assertive"
+            labelPosition="right"
+          />
+        ) : (
+          <PrimaryButton onClick={handleLogout} disabled={isLoggingOut}>
+            Logout
+          </PrimaryButton>
+        )}
+      </div>
     </div>
   );
 };
